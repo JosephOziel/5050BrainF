@@ -1,3 +1,3 @@
-# Factor-Knight
+# 5050BrainF
  
-Knight Implementation in Factor
+BrainF but each instruction has a 50/50 chance of running.
