@@ -1,10 +1,13 @@
-USING: accessors assocs command-line io io.encodings.binary
+USING: accessors assocs command-line combinators.random io io.encodings.binary
 io.files io.streams.string kernel math multiline namespaces
-peg.ebnf prettyprint sequences random ;
+peg.ebnf prettyprint sequences ;
 
 IN: 5050brainf
 
 <PRIVATE
+
+: 50-50 ( quot -- ) 
+    0.5 swap [ drop ] ifp ; inline
 
 TUPLE: 5050brainf pointer memory ;
 
@@ -17,18 +20,18 @@ TUPLE: 5050brainf pointer memory ;
 : set-memory ( 5050brainf value -- 5050brainf )
     over [ pointer>> ] [ memory>> ] bi set-at ;
 
-: (+) ( 5050brainf n -- 5050brainf )
-    [ get-memory ] dip + 255 bitand set-memory ;
+: (+) ( 5050brainf n -- 5050brainf )                           
+    [ [ get-memory ] dip + 255 bitand set-memory ] 50-50 ;
 
 : (-) ( 5050brainf n -- 5050brainf )
-    [ get-memory ] dip - 255 bitand set-memory ;
-
+    [ [ get-memory ] dip - 255 bitand set-memory ] 50-50 ;
+         
 : (.) ( 5050brainf -- 5050brainf )
     get-memory write1 ;
 
-: (,) ( 5050brainf -- 5050brainf )
-    read1 set-memory ;
-
+: (,) ( 5050brainf -- 5050brainf )                
+    read1 set-memory ;         
+             
 : (>) ( 5050brainf n -- 5050brainf )
     [ '[ _ + ] change-pointer ] 50-50 ;
 
@@ -37,10 +40,6 @@ TUPLE: 5050brainf pointer memory ;
 
 : compose-all ( seq -- quot )
     [ ] [ compose ] reduce ;
-
-! FIX THIS WORD
-: 50-50 ( quot -- quot ) 
-    { t f } random swap '[ @ call ] [ ] if ;
 
 EBNF: parse-5050brainf [=[
 
