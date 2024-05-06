@@ -7,7 +7,7 @@ IN: 5050brainf
 <PRIVATE
 
 : 50-50 ( quot -- ) 
-    0.5 swap [ drop ] ifp ; inline
+    0.5 swap [ ] ifp ; inline
 
 TUPLE: 5050brainf pointer memory ;
 
@@ -20,11 +20,11 @@ TUPLE: 5050brainf pointer memory ;
 : set-memory ( 5050brainf value -- 5050brainf )
     over [ pointer>> ] [ memory>> ] bi set-at ;
 
-: (+) ( 5050brainf n -- 5050brainf )                           
-    [ [ get-memory ] dip + 255 bitand set-memory ] 50-50 ;
+: (+) ( 5050brainf -- 5050brainf )                           
+    [ get-memory 1 + 255 bitand set-memory ] 50-50 ;
 
-: (-) ( 5050brainf n -- 5050brainf )
-    [ [ get-memory ] dip - 255 bitand set-memory ] 50-50 ;
+: (-) ( 5050brainf -- 5050brainf )
+    [ get-memory 1 - 255 bitand set-memory ] 50-50 ;
          
 : (.) ( 5050brainf -- 5050brainf )
     get-memory write1 ;
@@ -32,21 +32,21 @@ TUPLE: 5050brainf pointer memory ;
 : (,) ( 5050brainf -- 5050brainf )                
     read1 set-memory ;         
              
-: (>) ( 5050brainf n -- 5050brainf )
-    [ '[ _ + ] change-pointer ] 50-50 ;
+: (>) ( 5050brainf -- 5050brainf )
+    [ [ 1 + ] change-pointer ] 50-50 ;
 
-: (<) ( 5050brainf n -- 5050brainf )
-    [ '[ _ - ] change-pointer ] 50-50 ;
+: (<) ( 5050brainf -- 5050brainf )
+    [ [ 1 - ] change-pointer ] 50-50 ;
 
 : compose-all ( seq -- quot )
     [ ] [ compose ] reduce ;
 
 EBNF: parse-5050brainf [=[
 
-inc-ptr  = (">")+  => [[ length '[ _ (>) ] ]]
-dec-ptr  = ("<")+  => [[ length '[ _ (<) ] ]]
-inc-mem  = ("+")+  => [[ length '[ _ (+) ] ]]
-dec-mem  = ("-")+  => [[ length '[ _ (-) ] ]]
+inc-ptr  = ">"  => [[ [ (>) ] ]]
+dec-ptr  = "<" => [[ [ (<) ] ]]
+inc-mem  = "+"  => [[ [ (+) ] ]]
+dec-mem  = "-"  => [[ [ (-) ] ]]
 output   = "."  => [[ [ (.) ] ]]
 input    = ","  => [[ [ (,) ] ]]
 space    = [ \t\n\r]+ => [[ [ ] ]]
