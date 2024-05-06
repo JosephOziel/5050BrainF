@@ -1,6 +1,6 @@
 USING: accessors assocs command-line io io.encodings.binary
 io.files io.streams.string kernel math multiline namespaces
-peg.ebnf prettyprint sequences ;
+peg.ebnf prettyprint sequences random ;
 
 IN: 5050brainf
 
@@ -30,18 +30,17 @@ TUPLE: 5050brainf pointer memory ;
     read1 set-memory ;
 
 : (>) ( 5050brainf n -- 5050brainf )
-    '[ _ + ] change-pointer ;
+    [ '[ _ + ] change-pointer ] 50-50 ;
 
 : (<) ( 5050brainf n -- 5050brainf )
-    '[ _ - ] change-pointer ;
-
-: (#) ( 5050brainf -- 5050brainf )
-    dup
-    [ "ptr=" write pointer>> pprint ]
-    [ ",mem=" write memory>> pprint nl ] bi ;
+    [ '[ _ - ] change-pointer ] 50-50 ;
 
 : compose-all ( seq -- quot )
     [ ] [ compose ] reduce ;
+
+! FIX THIS WORD
+: 50-50 ( quot -- quot ) 
+    { t f } random swap '[ @ call ] [ ] if ;
 
 EBNF: parse-5050brainf [=[
 
@@ -51,11 +50,10 @@ inc-mem  = ("+")+  => [[ length '[ _ (+) ] ]]
 dec-mem  = ("-")+  => [[ length '[ _ (-) ] ]]
 output   = "."  => [[ [ (.) ] ]]
 input    = ","  => [[ [ (,) ] ]]
-debug    = "#"  => [[ [ (#) ] ]]
 space    = [ \t\n\r]+ => [[ [ ] ]]
-unknown  = (.)  => [[ "Invalid input" throw ]]
+unknown  = (.)  => [[ [ ]  ]]
 
-ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|debug|space
+ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|space
 loop  = "[" {loop|ops}+ "]" => [[ second compose-all '[ [ get-memory zero? ] _ until ] ]]
 
 code  = (loop|ops|unknown)*  => [[ compose-all ]]
