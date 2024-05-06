@@ -1,3 +1,4 @@
+! Copyright (c) 2024 Joseph Oziel
 USING: accessors assocs command-line combinators.random io io.encodings.binary
 io.files io.streams.string kernel math multiline namespaces
 peg.ebnf prettyprint sequences ;
